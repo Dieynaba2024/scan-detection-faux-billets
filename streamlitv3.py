@@ -10,6 +10,9 @@ import plotly.express as px
 import base64
 import io
 import os
+import joblib  # Pour charger le modèle
+from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 # Configuration de la page
 st.set_page_config(
@@ -18,6 +21,23 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# --- Nouvelle partie : Chargement du modèle ---
+@st.cache_resource
+def load_model():
+    # Chemin relatif pour Streamlit Cloud
+    model_path = "random_forest_model.sav"
+    scaler_path = "scaler.sav"
+    
+    try:
+        model = joblib.load(model_path)
+        scaler = joblib.load(scaler_path)
+        return model, scaler
+    except Exception as e:
+        st.error(f"Erreur de chargement du modèle : {str(e)}")
+        return None, None
+
+model, scaler = load_model()
 
 # Chemins des images locales
 GENUINE_BILL_IMAGE = "vraibillet.PNG"
@@ -258,3 +278,4 @@ if uploaded_file is not None:
         </div>
 
         """, unsafe_allow_html=True)
+
