@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Application de détection de faux billets - Version avec libellés français
+Application de détection de faux billets - Version optimisée pour Streamlit Cloud
 """
 
 import streamlit as st
@@ -10,7 +10,7 @@ import plotly.express as px
 import base64
 import io
 import os
-import joblib  # Pour charger le modèle
+import joblib
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 
@@ -22,16 +22,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Nouvelle partie : Chargement du modèle ---
+# --- Chargement du modèle ---
 @st.cache_resource
 def load_model():
-    # Chemin relatif pour Streamlit Cloud
-    model_path = "random_forest_model.sav"
-    scaler_path = "scaler.sav"
-    
     try:
-        model = joblib.load(model_path)
-        scaler = joblib.load(scaler_path)
+        model = joblib.load("random_forest_model.sav")
+        scaler = joblib.load("scaler.sav")
         return model, scaler
     except Exception as e:
         st.error(f"Erreur de chargement du modèle : {str(e)}")
@@ -39,7 +35,7 @@ def load_model():
 
 model, scaler = load_model()
 
-# Chemins des images locales
+# Chemins des images (fichiers à la racine)
 GENUINE_BILL_IMAGE = "vraibillet.PNG"
 FAKE_BILL_IMAGE = "fauxbillet.png"
 
@@ -120,7 +116,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Section Analyse avec libellés en français
+# Section Analyse
 uploaded_file = st.file_uploader(
     "Faites glisser et déposez le fichier ici ou cliquez sur le bouton pour Parcourir", 
     type=["csv"],
@@ -131,47 +127,44 @@ if uploaded_file is not None:
     try:
         df = pd.read_csv(uploaded_file, sep=';')
         
-        # Aperçu des données avec affichage progressif
+        # Aperçu des données
         st.markdown("#### Aperçu des données")
-        
-        # Nombre de lignes à afficher initialement
         preview_rows = 5
-        
-        # Création d'un élément vide pour le tableau
         table_placeholder = st.empty()
-        
-        # Afficher les premières lignes
         table_placeholder.dataframe(df.head(preview_rows), height=210, use_container_width=True)
         
-        # Bouton pour afficher plus de données
         if len(df) > preview_rows:
-            if st.button("Afficher plus", key="show_more_btn", 
-                        help="Afficher plus de lignes du fichier",
-                        type="secondary"):
-                # Afficher toutes les données dans le même tableau
+            if st.button("Afficher plus", key="show_more_btn", type="secondary"):
                 table_placeholder.dataframe(df, height=min(800, len(df)*35), use_container_width=True)
         
         if st.button("Lancer la détection", key="analyze_btn"):
             with st.spinner("Analyse en cours..."):
-                try:
-                    file_bytes = io.BytesIO(uploaded_file.getvalue())
-                    files = {"file": (uploaded_file.name, file_bytes, "text/csv")}
-                    
-                    response = requests.post("http://localhost:8000/predict", files=files)
-                    
-                    if response.status_code == 200:
-                        results = response.json()
-                        predictions = results['predictions']
+                if model is None:
+                    st.error("Modèle non chargé - Impossible d'effectuer la prédiction")
+                else:
+                    try:
+                        # Exemple de prétraitement (à adapter selon vos colonnes)
+                        required_cols = ['diagonal', 'height_left', 'height_right', 'margin_low', 'margin_up', 'length']
+                        if not all(col in df.columns for col in required_cols):
+                            raise ValueError("Colonnes requises manquantes dans le fichier CSV")
+                            
+                        features = df[required_cols]
+                        features_scaled = scaler.transform(features)
+                        probas = model.predict_proba(features_scaled)
+                        
+                        predictions = [{
+                            'id': i,
+                            'prediction': "Genuine" if p[1] > 0.5 else "Fake",
+                            'probability': p[1]
+                        } for i, p in enumerate(probas)]
                         
                         st.success("Analyse terminée avec succès !")
                         
-                        # Résultats de détection
+                        # Affichage des résultats
                         st.markdown("#### Résultats de la détection")
-                        
                         genuine_img = image_to_base64(GENUINE_BILL_IMAGE)
                         fake_img = image_to_base64(FAKE_BILL_IMAGE)
                         
-                        # Afficher 3 résultats par ligne
                         cols_per_row = 3
                         for i in range(0, len(predictions), cols_per_row):
                             cols = st.columns(cols_per_row)
@@ -218,10 +211,8 @@ if uploaded_file is not None:
                         genuine_count = sum(1 for p in predictions if p['prediction'] == 'Genuine')
                         fake_count = len(predictions) - genuine_count
                         
-                        #st.markdown("#### Statistiques de détection")
                         st.markdown("<h4 style='text-align: center;'>Statistiques de détection</h4>", unsafe_allow_html=True)
                         
-                        # Cartes de statistiques
                         col1, col2, col3 = st.columns(3)
                         with col1:
                             st.markdown(f"""
@@ -248,7 +239,6 @@ if uploaded_file is not None:
                             """, unsafe_allow_html=True)
                         
                         # Graphique
-                        #st.markdown("#### Graphique des statistiques")
                         st.markdown("<h4 style='text-align: center;'>Graphique des statistiques</h4>", unsafe_allow_html=True)
                         fig = px.pie(
                             names=['Authentiques', 'Faux'],
@@ -260,10 +250,8 @@ if uploaded_file is not None:
                         fig.update_layout(showlegend=True, margin=dict(l=20, r=20, t=30, b=20))
                         st.plotly_chart(fig, use_container_width=True)
 
-                    else:
-                        st.error(f"Erreur API: {response.status_code} - {response.text}")
-                except requests.exceptions.RequestException as e:
-                    st.error(f"Erreur de connexion: {str(e)}")
+                    except Exception as e:
+                        st.error(f"Erreur lors de la prédiction : {str(e)}")
     except Exception as e:
         st.error(f"Erreur de lecture du fichier: {str(e)}")
         st.markdown("""
@@ -276,6 +264,4 @@ if uploaded_file is not None:
                 <li>Contient les colonnes requises</li>
             </ul>
         </div>
-
         """, unsafe_allow_html=True)
-
