@@ -94,7 +94,7 @@ st.markdown("""
 # Header identique
 st.markdown("""
 <div class="header">
-    <h2 style="color:white; margin:0;">💰 Application Scan Franc cfa </h2>
+    <h2 style="color:white; margin:0;">💰 Application Scan Franc cfa vs </h2>
     <p style="color:white; opacity:0.9; margin:0;">Solution de détection de faux billets</p>
 </div>
 """, unsafe_allow_html=True)
@@ -250,3 +250,4 @@ if uploaded_file is not None:
                         
                     except Exception as e:
                         st.error(f"Erreur: {str(e)}")
+
