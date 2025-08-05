@@ -75,7 +75,7 @@ st.markdown("""
 
 # 5. Interface simplifiée
 st.title("💰 Détection de Faux Billets")
-st.caption("Solution optimisée pour performance maximale")
+st.caption("Solution optimisée pour performance maximaler")
 
 # 6. Traitement des fichiers avec cache
 @st.cache_data(ttl=300, max_entries=3)  # Limite le cache à 3 fichiers
@@ -154,3 +154,4 @@ if uploaded_file:
 
 # 12. Pied de page optimisé
 #st.caption("© 2023 - Application optimisée pour Streamlit Cloud")
+
