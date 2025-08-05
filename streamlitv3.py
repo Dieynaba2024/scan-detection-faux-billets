@@ -20,8 +20,8 @@ st.set_page_config(
 )
 
 # Chemins des images locales
-GENUINE_BILL_IMAGE = "C:/Users/Lenovo/Documents/api_ml/EXAMEN/v3/vraibillet.PNG"
-FAKE_BILL_IMAGE = "C:/Users/Lenovo/Documents/api_ml/EXAMEN/v3/fauxbillet.png"
+GENUINE_BILL_IMAGE = "vraibillet.PNG"
+FAKE_BILL_IMAGE = "fauxbillet.png"
 
 # Vérification que les images existent
 if not os.path.exists(GENUINE_BILL_IMAGE):
@@ -256,4 +256,5 @@ if uploaded_file is not None:
                 <li>Contient les colonnes requises</li>
             </ul>
         </div>
+
         """, unsafe_allow_html=True)
