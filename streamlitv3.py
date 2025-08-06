@@ -181,7 +181,7 @@ st.markdown("""
 st.markdown("""
 <div class="header-container">
     <div style="position: relative; z-index: 1;">
-        <h1 style="color:white; margin:0; font-size:2.2rem;">💵 Scan Franc CFA</h1>
+        <h1 style="color:white; margin:0; font-size:2.2rem;">💵 Scan Franc CFA t</h1>
         <p style="color:white; opacity:0.9; margin:0; font-size:1.1rem;">Solution avancée de détection de faux billets</p>
     </div>
 </div>
@@ -431,3 +431,4 @@ if uploaded_file is None:
         <p style="font-style:italic; margin-top:1rem;">Pour des résultats optimaux, assurez-vous que votre fichier suit le format requis.</p>
     </div>
     """, unsafe_allow_html=True)
+
