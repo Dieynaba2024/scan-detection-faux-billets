@@ -17,7 +17,7 @@ import numpy as np
 # Configuration de la page
 st.set_page_config(
     page_title="Détection de Faux Billets",
-    page_icon="💰",
+    page_icon="💵",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -265,3 +265,4 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
