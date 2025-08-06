@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 import base64
 import os
 import joblib
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 # Configuration de la page
@@ -431,5 +432,6 @@ if uploaded_file is None:
         <p style="font-style:italic; margin-top:1rem;">Pour des résultats optimaux, assurez-vous que votre fichier suit le format requis.</p>
     </div>
     """, unsafe_allow_html=True)
+
 
 
