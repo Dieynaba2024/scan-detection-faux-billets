@@ -75,7 +75,7 @@ st.markdown("""
 # Header
 st.markdown("""
 <div class="header">
-    <h2>💰 Application Scan Franc CFA</h2>
+    <h2>💰 Application Scan Franc CFA FG</h2>
     <p>Solution de détection de faux billets</p>
 </div>
 """, unsafe_allow_html=True)
@@ -162,3 +162,4 @@ if uploaded_file is not None:
         st.error(f"Erreur : {str(e)}")
 else:
     st.info("Veuillez importer un fichier CSV au format attendu (séparateur ;)")
+
