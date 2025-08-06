@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Application de détection de faux billets - Version Modern UI Dashboard
+Application de détection de faux billets - Visual Cards Design
 """
 
 import streamlit as st
 import pandas as pd
-import requests
 import plotly.express as px
 import base64
-import io
 import os
 import joblib
-from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 # Configuration de la page
@@ -42,16 +39,18 @@ def image_to_base64(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode('utf-8')
 
-# --- CSS Design Neon Modern ---
+genuine_img_b64 = image_to_base64(GENUINE_BILL_IMAGE)
+fake_img_b64 = image_to_base64(FAKE_BILL_IMAGE)
+
+# --- CSS Modern & Classy ---
 st.markdown("""
 <style>
 body {
-    background: #0f2027;
-    background: linear-gradient(to right, #2c5364, #203a43, #0f2027);
-    color: #f0f0f0;
+    background: #0f0f0f;
+    color: #e0e0e0;
 }
 .header {
-    background: linear-gradient(135deg, #12c2e9, #c471ed, #f64f59);
+    background: linear-gradient(135deg, #141e30, #243b55);
     color: white;
     padding: 1.5rem;
     border-radius: 12px;
@@ -60,34 +59,48 @@ body {
     font-size: 1.5rem;
     font-weight: bold;
 }
-.stat-badge {
+.badge {
     display: inline-block;
-    padding: 1rem 2rem;
-    border-radius: 30px;
-    background: linear-gradient(135deg, #00f2fe, #4facfe);
-    color: white;
-    font-size: 1.3rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 20px;
+    background: #1c1c1c;
+    color: #cfcfcf;
+    font-size: 1.2rem;
     margin: 0.5rem;
-    animation: pulse 2s infinite;
+    border: 1px solid #333;
 }
-.stat-badge.fake {
-    background: linear-gradient(135deg, #f85032, #e73827);
+.badge.auth {
+    border-left: 6px solid #4cb8c4;
 }
-.stat-badge.total {
-    background: linear-gradient(135deg, #11998e, #38ef7d);
+.badge.fake {
+    border-left: 6px solid #f7797d;
 }
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
 }
-.dataframe th {
-    background-color: #0d1117 !important;
-    color: #58a6ff !important;
+.card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease;
 }
-.dataframe td {
-    background-color: #161b22 !important;
-    color: #f0f6fc !important;
+.card:hover {
+    transform: scale(1.02);
+}
+.progress-bar {
+    height: 10px;
+    background: #333;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+.progress-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+    border-radius: 5px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -102,7 +115,7 @@ if uploaded_file is not None:
     try:
         df = pd.read_csv(uploaded_file, sep=';')
 
-        # --- Layout Start ---
+        # --- Layout: Data Overview ---
         col1, col2 = st.columns([1.5, 2])
 
         with col1:
@@ -139,36 +152,54 @@ if uploaded_file is not None:
                             # --- Stats Badges ---
                             st.markdown(f"""
                             <div style="text-align:center;">
-                                <span class="stat-badge total">🔢 Total : {total}</span>
-                                <span class="stat-badge">✅ Authentiques : {genuine_count}</span>
-                                <span class="stat-badge fake">❌ Faux : {fake_count}</span>
+                                <span class="badge">🔢 Total : {total}</span>
+                                <span class="badge auth">✅ Authentiques : {genuine_count}</span>
+                                <span class="badge fake">❌ Faux : {fake_count}</span>
                             </div>
                             """, unsafe_allow_html=True)
 
-                            # --- Graphique (Barres Horizontales) ---
-                            st.markdown("### 📈 Statistiques Visuelles")
+                            # --- Graphique ---
+                            st.markdown("### 📈 Répartition des Billets")
                             fig = px.bar(
                                 x=[genuine_count, fake_count],
                                 y=['Authentiques', 'Faux'],
                                 orientation='h',
                                 color=['Authentiques', 'Faux'],
-                                color_discrete_map={'Authentiques': '#00f2fe', 'Faux': '#f85032'},
+                                color_discrete_map={'Authentiques': '#4cb8c4', 'Faux': '#f7797d'},
                                 text_auto=True,
                                 height=300
                             )
                             fig.update_layout(
                                 plot_bgcolor='rgba(0,0,0,0)',
                                 paper_bgcolor='rgba(0,0,0,0)',
-                                font_color="#f0f0f0"
+                                font_color="#e0e0e0"
                             )
                             st.plotly_chart(fig, use_container_width=True)
 
-                            # --- Résultats détaillés ---
-                            st.markdown("### 📝 Résultats de la détection")
-                            st.dataframe(df_results, use_container_width=True)
+                            # --- Visual Cards Résultats ---
+                            st.markdown("### 🖼️ Résultats Visuels des Billets")
+                            st.markdown('<div class="card-grid">', unsafe_allow_html=True)
+
+                            for idx, row in df_results.iterrows():
+                                img_b64 = genuine_img_b64 if row['prediction'] == "Authentique" else fake_img_b64
+                                color_fill = "#4cb8c4" if row['prediction'] == "Authentique" else "#f7797d"
+                                percent = int(row['proba_authentic']*100) if row['prediction'] == "Authentique" else int((1-row['proba_authentic'])*100)
+                                description = "Billet Authentique" if row['prediction'] == "Authentique" else "Billet Faux"
+
+                                st.markdown(f"""
+                                <div class="card">
+                                    <img src="data:image/png;base64,{img_b64}" style="width:100%; border-radius:8px; margin-bottom:0.5rem;">
+                                    <h5 style="margin:0; color:{color_fill};">{description}</h5>
+                                    <p style="margin:0.2rem 0;">Prédiction : {percent}%</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width:{percent}%; background:{color_fill};"></div>
+                                    </div>
+                                </div>
+                                """, unsafe_allow_html=True)
+
+                            st.markdown('</div>', unsafe_allow_html=True)
 
     except Exception as e:
         st.error(f"Erreur lors de la lecture du fichier : {str(e)}")
 else:
     st.info("Veuillez importer un fichier CSV pour lancer l'analyse.")
-
