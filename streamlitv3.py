@@ -216,7 +216,7 @@ if uploaded_file is not None:
         # Aperçu des données
         with st.expander("📊 Aperçu des données", expanded=True):
             st.dataframe(df.style
-                        .background_gradient(cmap='Blues', subset=df.select_dtypes(include='number').columns)
+                        .background_gradient(cmap='Blues', subset=df.select_dtypes(include='number').columns))
         
         if analyze_btn:
             with st.spinner("🔍 Analyse en cours... Veuillez patienter"):
@@ -431,4 +431,5 @@ if uploaded_file is None:
         <p style="font-style:italic; margin-top:1rem;">Pour des résultats optimaux, assurez-vous que votre fichier suit le format requis.</p>
     </div>
     """, unsafe_allow_html=True)
+
 
