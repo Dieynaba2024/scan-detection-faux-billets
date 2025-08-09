@@ -112,7 +112,6 @@ st.markdown("""
 st.markdown("""
 <div class="header">
     <h2 style="color:white; margin:0;">  🔎 Application Scan Franc cfa </h2>
-   
     <p style="color:white; opacity:0.9; margin:10;"> ✅ Solution de détection de faux billets</p>
 </div>
 """, unsafe_allow_html=True)
@@ -266,6 +265,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
