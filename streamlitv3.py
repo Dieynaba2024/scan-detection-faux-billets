@@ -112,12 +112,12 @@ st.markdown("""
 st.markdown("""
 <div class="header">
     <h2 style="color:white; margin:0;">  🔎 Application Scan Franc cfa </h2>
-    #<p style="color:white; opacity:0.9; margin:10;"> 💰💵 ⛶ Solution de détection de faux billets</p>
-    <p style="color:white; opacity:0.9; margin:10;"> ⛶ Solution de détection de faux billets</p>
+   
+    <p style="color:white; opacity:0.9; margin:10;"> ✅ Solution de détection de faux billets</p>
 </div>
 """, unsafe_allow_html=True)
 
-# Section Analyse
+# Section Analyse  <p style="color:white; opacity:0.9; margin:10;"> 💰💵 ⛶ Solution de détection de faux billets</p>
 uploaded_file = st.file_uploader(
     "Faites glisser et déposez le fichier ici ou cliquez sur le bouton 'Browse files' pour Parcourir",
     type=["csv"],
@@ -266,6 +266,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
