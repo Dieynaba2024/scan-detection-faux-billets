@@ -82,13 +82,13 @@ st.markdown("""
     }
    
     .genuine-card {
-        border-left: 2px solid var(--success);
-        border-radius: 25px;
+        border-left: 3px solid var(--success);
+        border-radius: 15px;
     }
    
     .fake-card {
-        border-left: 2px solid var(--danger);
-        border-radius: 25px;
+        border-left: 3px solid var(--danger);
+        border-radius: 15px;
     }
    
     .stat-card {
@@ -181,7 +181,7 @@ if uploaded_file is not None:
                                             <div class="card genuine-card">
                                                 <div style="display:flex; align-items:center;">
                                                     <div style="flex:1;">
-                                                        <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Billet n°{pred['id']} - Vrai </h5>
+                                                        <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Billet n°{pred['id']} Authenticité: Vrai </h5>
                                                         <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{pred['probability']*100:.1f}%</strong></p>
                                                         <div style="height:6px; background:#e9ecef; border-radius:3px;">
                                                             <div style="height:100%; width:{pred['probability']*100}%; background:var(--success); border-radius:3px;"></div>
@@ -198,7 +198,7 @@ if uploaded_file is not None:
                                             <div class="card fake-card">
                                                 <div style="display:flex; align-items:center;">
                                                     <div style="flex:1;">
-                                                        <h5 style="color:var(--danger); margin:0 0 0.3rem 0;">Billet n°{pred['id']} - Faux</h5>
+                                                        <h5 style="color:var(--danger); margin:0 0 0.3rem 0;">Billet n°{pred['id']} Authenticité: Faux</h5>
                                                         <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{(1-pred['probability'])*100:.1f}%</strong></p>
                                                         <div style="height:6px; background:#e9ecef; border-radius:3px;">
                                                             <div style="height:100%; width:{(1-pred['probability'])*100}%; background:var(--danger); border-radius:3px;"></div>
@@ -220,7 +220,7 @@ if uploaded_file is not None:
                         col1, col2, col3 = st.columns(3)
                         with col1:
                             st.markdown(f"""
-                            <div class="card stat-card" style= "border-right: 2px solid var(--primary)">
+                            <div class="card stat-card" style= "border-left: 3px solid var(--primary)">
                                 <div class="stat-value">{len(predictions)}</div>
                                 <div class="stat-label">Billets analysés</div>
                             </div>
@@ -228,7 +228,7 @@ if uploaded_file is not None:
                        
                         with col2:
                             st.markdown(f"""
-                            <div class="card stat-card" style= "border-right: 2px solid var(--success)">
+                            <div class="card stat-card" style= "border-left: 3px solid var(--success)">
                                 <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
                                 <div class="stat-label">Vrais billets</div>
                             </div>
@@ -236,7 +236,7 @@ if uploaded_file is not None:
                        
                         with col3:
                             st.markdown(f"""
-                            <div class="card stat-card" style= "border-right: 2px solid var(--danger)">
+                            <div class="card stat-card" style= "border-left: 3px solid var(--danger)">
                                 <div class="stat-value" style="color:var(--danger);">{fake_count}</div>
                                 <div class="stat-label">Faux billets</div>
                             </div>
@@ -269,6 +269,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
