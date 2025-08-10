@@ -90,32 +90,12 @@ st.markdown("""
    
     .stat-card {
         text-align: center;
-        padding: 1.5rem;
-        background: linear-gradient(145deg, #ffffff, #f8f9fa);
-        border-radius: 12px;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.05);
-        transition: transform 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-5px);
+        padding: 0.8rem;
     }
    
     .stat-value {
-        font-size: 2.2rem;
+        font-size: 1.8rem;
         font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    
-    .stat-label {
-        font-size: 1rem;
-        color: #6c757d;
-        font-weight: 500;
-    }
-    
-    .stat-icon {
-        font-size: 2rem;
-        margin-bottom: 1rem;
         color: var(--secondary);
     }
    
@@ -124,52 +104,6 @@ st.markdown("""
         background: #f0f2f6 !important;
         color: var(--secondary) !important;
         border: 1px solid #ddd !important;
-    }
-    
-    .result-item {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 8px;
-        background: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    
-    .result-icon {
-        font-size: 1.8rem;
-        margin-right: 1rem;
-        min-width: 50px;
-        text-align: center;
-    }
-    
-    .result-content {
-        flex: 1;
-    }
-    
-    .result-title {
-        font-weight: 600;
-        margin-bottom: 0.3rem;
-    }
-    
-    .result-progress {
-        height: 8px;
-        border-radius: 4px;
-        background: #e9ecef;
-        margin-top: 0.5rem;
-        overflow: hidden;
-    }
-    
-    .result-progress-bar {
-        height: 100%;
-    }
-    
-    .result-image {
-        margin-left: 1rem;
-        border-radius: 6px;
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -182,7 +116,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Section Analyse
+# Section Analyse  <p style="color:white; opacity:0.9; margin:10;"> 🔎💰💵 ⛶ Solution de détection de faux billets</p>
 uploaded_file = st.file_uploader(
     "Faites glisser et déposez le fichier ici ou cliquez sur le bouton 'Browse files' pour Parcourir",
     type=["csv"],
@@ -193,58 +127,44 @@ if uploaded_file is not None:
     try:
         df = pd.read_csv(uploaded_file, sep=';')
        
-        # Aperçu des données avec prédiction
+        # Aperçu des données
         st.markdown("#### Aperçu des données")
-        
-        # Créer un identifiant unique si la colonne 'id' n'existe pas
-        if 'id' not in df.columns:
-            df['id'] = range(1, len(df)+1)
-        
-        # Préparation des données pour l'affichage
+        preview_rows = 5
+        table_placeholder = st.empty()
+        table_placeholder.dataframe(df.head(preview_rows), height=210, use_container_width=True)
+       
+        if len(df) > preview_rows:
+            if st.button("Afficher plus", key="show_more_btn", type="secondary"):
+                table_placeholder.dataframe(df, height=min(800, len(df)*35), use_container_width=True)
+       
         if st.button("Lancer la détection", key="analyze_btn"):
             with st.spinner("Analyse en cours..."):
                 if model is None:
                     st.error("Modèle non chargé - Impossible d'effectuer la prédiction")
                 else:
                     try:
+                        # Exemple de prétraitement (à adapter selon vos colonnes)
                         required_cols = ['diagonal', 'height_left', 'height_right', 'margin_low', 'margin_up', 'length']
                         if not all(col in df.columns for col in required_cols):
-                            missing_cols = [col for col in required_cols if col not in df.columns]
-                            raise ValueError(f"Colonnes requises manquantes dans le fichier CSV: {', '.join(missing_cols)}")
+                            raise ValueError("Colonnes requises manquantes dans le fichier CSV")
                            
                         features = df[required_cols]
                         features_scaled = scaler.transform(features)
                         probas = model.predict_proba(features_scaled)
                        
                         predictions = [{
-                            'id': df.iloc[i]['id'] if 'id' in df.columns else i+1,
+                            'id': i,
                             'prediction': "Genuine" if p[1] > 0.5 else "Fake",
                             'probability': p[1]
                         } for i, p in enumerate(probas)]
-                        
-                        # Ajout de la colonne de prédiction au DataFrame
-                        df['Prédiction'] = ['Genuine' if p[1] > 0.5 else 'Fake' for p in probas]
-                        df['Probabilité'] = [p[1]*100 if p[1] > 0.5 else (1-p[1])*100 for p in probas]
                        
                         st.success("Analyse terminée avec succès !")
                        
-                        # Affichage de l'aperçu avec prédiction
-                        preview_rows = 5
-                        table_placeholder = st.empty()
-                        display_cols = [col for col in df.columns if col not in ['Prédiction', 'Probabilité']]
-                        table_placeholder.dataframe(df[display_cols + ['Prédiction', 'Probabilité']].head(preview_rows), 
-                                                  height=210, use_container_width=True)
-       
-                        if len(df) > preview_rows:
-                            if st.button("Afficher plus", key="show_more_btn", type="secondary"):
-                                table_placeholder.dataframe(df[display_cols + ['Prédiction', 'Probabilité']], 
-                                                          height=min(800, len(df)*35), use_container_width=True)
-                       
-                        # Affichage des résultats sous forme de liste
+                        # Affichage des résultats
                         st.markdown("#### Résultats de la détection")
                         genuine_img = image_to_base64(GENUINE_BILL_IMAGE)
                         fake_img = image_to_base64(FAKE_BILL_IMAGE)
-                        
+                       
                         cols_per_row = 3
                         for i in range(0, len(predictions), cols_per_row):
                             cols = st.columns(cols_per_row)
@@ -254,126 +174,81 @@ if uploaded_file is not None:
                                     with cols[j]:
                                         if pred['prediction'] == 'Genuine':
                                             st.markdown(f"""
-                                            <div class="result-item" style="border-left: 4px solid var(--success);">
-                                                <div class="result-icon" style="color: var(--success);">✓</div>
-                                                <div class="result-content">
-                                                    <div class="result-title">Billet n°{pred['id']} - Authentique</div>
-                                                    <div>Probabilité: <strong>{pred['probability']*100:.1f}%</strong></div>
-                                                    <div class="result-progress">
-                                                        <div class="result-progress-bar" style="width: {pred['probability']*100}%; background: var(--success);"></div>
+                                            <div class="card genuine-card">
+                                                <div style="display:flex; align-items:center;">
+                                                    <div style="flex:1;">
+                                                        <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Billet n°{pred['id']} - Authentique</h5>
+                                                        <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{pred['probability']*100:.1f}%</strong></p>
+                                                        <div style="height:6px; background:#e9ecef; border-radius:3px;">
+                                                            <div style="height:100%; width:{pred['probability']*100}%; background:var(--success); border-radius:3px;"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div style="margin-left:1rem;">
+                                                        <img src="data:image/png;base64,{genuine_img}" width="80" style="border-radius:6px;">
                                                     </div>
                                                 </div>
-                                                <img src="data:image/png;base64,{genuine_img}" class="result-image">
                                             </div>
                                             """, unsafe_allow_html=True)
                                         else:
                                             st.markdown(f"""
-                                            <div class="result-item" style="border-left: 4px solid var(--danger);">
-                                                <div class="result-icon" style="color: var(--danger);">✗</div>
-                                                <div class="result-content">
-                                                    <div class="result-title">Billet n°{pred['id']} - Faux</div>
-                                                    <div>Probabilité: <strong>{(1-pred['probability'])*100:.1f}%</strong></div>
-                                                    <div class="result-progress">
-                                                        <div class="result-progress-bar" style="width: {(1-pred['probability'])*100}%; background: var(--danger);"></div>
+                                            <div class="card fake-card">
+                                                <div style="display:flex; align-items:center;">
+                                                    <div style="flex:1;">
+                                                        <h5 style="color:var(--danger); margin:0 0 0.3rem 0;">Billet n°{pred['id']} - Faux</h5>
+                                                        <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{(1-pred['probability'])*100:.1f}%</strong></p>
+                                                        <div style="height:6px; background:#e9ecef; border-radius:3px;">
+                                                            <div style="height:100%; width:{(1-pred['probability'])*100}%; background:var(--danger); border-radius:3px;"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div style="margin-left:1rem;">
+                                                        <img src="data:image/png;base64,{fake_img}" width="80" style="border-radius:6px;">
                                                     </div>
                                                 </div>
-                                                <img src="data:image/png;base64,{fake_img}" class="result-image">
                                             </div>
                                             """, unsafe_allow_html=True)
                        
-                        # Statistiques améliorées
+                        # Statistiques
                         genuine_count = sum(1 for p in predictions if p['prediction'] == 'Genuine')
                         fake_count = len(predictions) - genuine_count
-                        genuine_percent = (genuine_count / len(predictions)) * 100 if len(predictions) > 0 else 0
-                        fake_percent = (fake_count / len(predictions)) * 100 if len(predictions) > 0 else 0
                        
-                        st.markdown("<h4 style='text-align: center; margin-top: 2rem;'>Statistiques de détection</h4>", unsafe_allow_html=True)
+                        st.markdown("<h4 style='text-align: center;'>Statistiques de détection</h4>", unsafe_allow_html=True)
                        
-                        col1, col2, col3, col4 = st.columns(4)
+                        col1, col2, col3 = st.columns(3)
                         with col1:
                             st.markdown(f"""
-                            <div class="stat-card">
-                                <div class="stat-icon">📊</div>
+                            <div class="card stat-card">
                                 <div class="stat-value">{len(predictions)}</div>
-                                <div class="stat-label">Total analysés</div>
+                                <div class="stat-label">Billets analysés</div>
                             </div>
                             """, unsafe_allow_html=True)
                        
                         with col2:
                             st.markdown(f"""
-                            <div class="stat-card">
-                                <div class="stat-icon">✅</div>
+                            <div class="card stat-card">
                                 <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
-                                <div class="stat-label">Authentiques ({genuine_percent:.1f}%)</div>
+                                <div class="stat-label">Authentiques</div>
                             </div>
                             """, unsafe_allow_html=True)
                        
                         with col3:
                             st.markdown(f"""
-                            <div class="stat-card">
-                                <div class="stat-icon">❌</div>
+                            <div class="card stat-card">
                                 <div class="stat-value" style="color:var(--danger);">{fake_count}</div>
-                                <div class="stat-label">Faux billets ({fake_percent:.1f}%)</div>
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                        with col4:
-                            st.markdown(f"""
-                            <div class="stat-card">
-                                <div class="stat-icon">🔍</div>
-                                <div class="stat-value" style="color:var(--secondary);">{fake_percent:.1f}%</div>
-                                <div class="stat-label">Taux de fraude</div>
+                                <div class="stat-label">Faux billets</div>
                             </div>
                             """, unsafe_allow_html=True)
                        
-                        # Graphique amélioré
-                        st.markdown("<h4 style='text-align: center; margin-top: 2rem;'>Répartition des résultats</h4>", unsafe_allow_html=True)
-                        
-                        fig_col1, fig_col2 = st.columns([2, 1])
-                        
-                        with fig_col1:
-                            fig = px.pie(
-                                names=['Authentiques', 'Faux'],
-                                values=[genuine_count, fake_count],
-                                color=['Authentiques', 'Faux'],
-                                color_discrete_map={'Authentiques': '#4CAF50', 'Faux': '#F44336'},
-                                hole=0.5
-                            )
-                            fig.update_traces(textposition='inside', textinfo='percent+label')
-                            fig.update_layout(
-                                showlegend=False, 
-                                margin=dict(l=20, r=20, t=30, b=20),
-                                height=400
-                            )
-                            st.plotly_chart(fig, use_container_width=True)
-                            
-                        with fig_col2:
-                            avg_confidence_genuine = np.mean([p['probability'] for p in predictions if p['prediction'] == 'Genuine']) * 100 if genuine_count > 0 else 0
-                            avg_confidence_fake = np.mean([1-p['probability'] for p in predictions if p['prediction'] == 'Fake']) * 100 if fake_count > 0 else 0
-                            
-                            st.markdown(f"""
-                            <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); height: 100%;">
-                                <h5 style="margin-top: 0; color: var(--secondary);">Confiance moyenne</h5>
-                                <div style="margin-bottom: 1rem;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
-                                        <span>Authentiques:</span>
-                                        <span><strong>{avg_confidence_genuine:.1f}%</strong></span>
-                                    </div>
-                                    <div style="height: 8px; background: #e0e0e0; border-radius: 4px;">
-                                        <div style="height: 100%; width: {avg_confidence_genuine}%; background: var(--success); border-radius: 4px;"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
-                                        <span>Faux:</span>
-                                        <span><strong>{avg_confidence_fake:.1f}%</strong></span>
-                                    </div>
-                                    <div style="height: 8px; background: #e0e0e0; border-radius: 4px;">
-                                        <div style="height: 100%; width: {avg_confidence_fake}%; background: var(--danger); border-radius: 4px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            """, unsafe_allow_html=True)
+                        # Graphique
+                        st.markdown("<h4 style='text-align: center;'>Graphique des statistiques</h4>", unsafe_allow_html=True)
+                        fig = px.pie(
+                            names=['Authentiques', 'Faux'],
+                            values=[genuine_count, fake_count],
+                            color=['Authentiques', 'Faux'],
+                            color_discrete_map={'Authentiques': '#4CAF50', 'Faux': '#F44336'},
+                            hole=0.4
+                        )
+                        fig.update_layout(showlegend=True, margin=dict(l=20, r=20, t=30, b=20))
+                        st.plotly_chart(fig, use_container_width=True)
 
                     except Exception as e:
                         st.error(f"Erreur lors de la prédiction : {str(e)}")
@@ -390,3 +265,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
+
+
+
