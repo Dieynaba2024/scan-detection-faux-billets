@@ -179,7 +179,7 @@ if uploaded_file is not None:
                                             <div class="card genuine-card">
                                                 <div style="display:flex; align-items:center;">
                                                     <div style="flex:1;">
-                                                        <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Billet n°{pred['id']} - Authentique</h5>
+                                                        <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Billet n°{pred['id']} - Vrai </h5>
                                                         <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{pred['probability']*100:.1f}%</strong></p>
                                                         <div style="height:6px; background:#e9ecef; border-radius:3px;">
                                                             <div style="height:100%; width:{pred['probability']*100}%; background:var(--success); border-radius:3px;"></div>
@@ -228,7 +228,7 @@ if uploaded_file is not None:
                             st.markdown(f"""
                             <div class="card stat-card">
                                 <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
-                                <div class="stat-label">Authentiques</div>
+                                <div class="stat-label">Vrais billets</div>
                             </div>
                             """, unsafe_allow_html=True)
                        
@@ -243,10 +243,10 @@ if uploaded_file is not None:
                         # Graphique
                         st.markdown("<h4 style='text-align: center;'>Graphique des statistiques</h4>", unsafe_allow_html=True)
                         fig = px.pie(
-                            names=['Authentiques', 'Faux'],
+                            names=['Vrai', 'Faux'],
                             values=[genuine_count, fake_count],
-                            color=['Authentiques', 'Faux'],
-                            color_discrete_map={'Authentiques': '#4CAF50', 'Faux': '#F44336'},
+                            color=['Vrai', 'Faux'],
+                            color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
                             hole=0.4
                         )
                         fig.update_layout(showlegend=True, margin=dict(l=20, r=20, t=30, b=20))
@@ -267,6 +267,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
