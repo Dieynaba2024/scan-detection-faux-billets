@@ -107,7 +107,7 @@ st.markdown("""
     }
    
     .fake-card {
-        border-top: 4px solid var(--danger);
+        border: 2px solid var(--danger);
     }
     
     .fake-card::before {
@@ -375,3 +375,4 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
