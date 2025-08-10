@@ -196,6 +196,10 @@ if uploaded_file is not None:
         # Aperçu des données avec prédiction
         st.markdown("#### Aperçu des données")
         
+        # Créer un identifiant unique si la colonne 'id' n'existe pas
+        if 'id' not in df.columns:
+            df['id'] = range(1, len(df)+1)
+        
         # Préparation des données pour l'affichage
         if st.button("Lancer la détection", key="analyze_btn"):
             with st.spinner("Analyse en cours..."):
@@ -205,33 +209,35 @@ if uploaded_file is not None:
                     try:
                         required_cols = ['diagonal', 'height_left', 'height_right', 'margin_low', 'margin_up', 'length']
                         if not all(col in df.columns for col in required_cols):
-                            raise ValueError("Colonnes requises manquantes dans le fichier CSV")
+                            missing_cols = [col for col in required_cols if col not in df.columns]
+                            raise ValueError(f"Colonnes requises manquantes dans le fichier CSV: {', '.join(missing_cols)}")
                            
                         features = df[required_cols]
                         features_scaled = scaler.transform(features)
                         probas = model.predict_proba(features_scaled)
                        
                         predictions = [{
-                            'id': i,
+                            'id': df.iloc[i]['id'] if 'id' in df.columns else i+1,
                             'prediction': "Genuine" if p[1] > 0.5 else "Fake",
                             'probability': p[1]
                         } for i, p in enumerate(probas)]
                         
                         # Ajout de la colonne de prédiction au DataFrame
                         df['Prédiction'] = ['Genuine' if p[1] > 0.5 else 'Fake' for p in probas]
-                        df['Probabilité'] = [p[1] if p[1] > 0.5 else 1-p[1] for p in probas]
+                        df['Probabilité'] = [p[1]*100 if p[1] > 0.5 else (1-p[1])*100 for p in probas]
                        
                         st.success("Analyse terminée avec succès !")
                        
                         # Affichage de l'aperçu avec prédiction
                         preview_rows = 5
                         table_placeholder = st.empty()
-                        table_placeholder.dataframe(df[['id'] + required_cols + ['Prédiction', 'Probabilité']].head(preview_rows), 
+                        display_cols = [col for col in df.columns if col not in ['Prédiction', 'Probabilité']]
+                        table_placeholder.dataframe(df[display_cols + ['Prédiction', 'Probabilité']].head(preview_rows), 
                                                   height=210, use_container_width=True)
        
                         if len(df) > preview_rows:
                             if st.button("Afficher plus", key="show_more_btn", type="secondary"):
-                                table_placeholder.dataframe(df[['id'] + required_cols + ['Prédiction', 'Probabilité']], 
+                                table_placeholder.dataframe(df[display_cols + ['Prédiction', 'Probabilité']], 
                                                           height=min(800, len(df)*35), use_container_width=True)
                        
                         # Affichage des résultats sous forme de liste
@@ -278,8 +284,8 @@ if uploaded_file is not None:
                         # Statistiques améliorées
                         genuine_count = sum(1 for p in predictions if p['prediction'] == 'Genuine')
                         fake_count = len(predictions) - genuine_count
-                        genuine_percent = (genuine_count / len(predictions)) * 100
-                        fake_percent = (fake_count / len(predictions)) * 100
+                        genuine_percent = (genuine_count / len(predictions)) * 100 if len(predictions) > 0 else 0
+                        fake_percent = (fake_count / len(predictions)) * 100 if len(predictions) > 0 else 0
                        
                         st.markdown("<h4 style='text-align: center; margin-top: 2rem;'>Statistiques de détection</h4>", unsafe_allow_html=True)
                        
@@ -342,37 +348,32 @@ if uploaded_file is not None:
                             st.plotly_chart(fig, use_container_width=True)
                             
                         with fig_col2:
-                            avg_confidence_genuine = np.mean([p['probability'] for p in predictions if p['prediction'] == 'Genuine']) * 100
-                            avg_confidence_fake = np.mean([1-p['probability'] for p in predictions if p['prediction'] == 'Fake']) * 100
+                            avg_confidence_genuine = np.mean([p['probability'] for p in predictions if p['prediction'] == 'Genuine']) * 100 if genuine_count > 0 else 0
+                            avg_confidence_fake = np.mean([1-p['probability'] for p in predictions if p['prediction'] == 'Fake']) * 100 if fake_count > 0 else 0
                             
-                            st.markdown("""
+                            st.markdown(f"""
                             <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); height: 100%;">
                                 <h5 style="margin-top: 0; color: var(--secondary);">Confiance moyenne</h5>
                                 <div style="margin-bottom: 1rem;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
                                         <span>Authentiques:</span>
-                                        <span><strong>{:.1f}%</strong></span>
+                                        <span><strong>{avg_confidence_genuine:.1f}%</strong></span>
                                     </div>
                                     <div style="height: 8px; background: #e0e0e0; border-radius: 4px;">
-                                        <div style="height: 100%; width: {}%; background: var(--success); border-radius: 4px;"></div>
+                                        <div style="height: 100%; width: {avg_confidence_genuine}%; background: var(--success); border-radius: 4px;"></div>
                                     </div>
                                 </div>
                                 <div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
                                         <span>Faux:</span>
-                                        <span><strong>{:.1f}%</strong></span>
+                                        <span><strong>{avg_confidence_fake:.1f}%</strong></span>
                                     </div>
                                     <div style="height: 8px; background: #e0e0e0; border-radius: 4px;">
-                                        <div style="height: 100%; width: {}%; background: var(--danger); border-radius: 4px;"></div>
+                                        <div style="height: 100%; width: {avg_confidence_fake}%; background: var(--danger); border-radius: 4px;"></div>
                                     </div>
                                 </div>
                             </div>
-                            """.format(
-                                avg_confidence_genuine if genuine_count > 0 else 0,
-                                avg_confidence_genuine if genuine_count > 0 else 0,
-                                avg_confidence_fake if fake_count > 0 else 0,
-                                avg_confidence_fake if fake_count > 0 else 0
-                            ), unsafe_allow_html=True)
+                            """, unsafe_allow_html=True)
 
                     except Exception as e:
                         st.error(f"Erreur lors de la prédiction : {str(e)}")
