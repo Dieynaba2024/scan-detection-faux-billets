@@ -82,19 +82,18 @@ st.markdown("""
     }
    
     .genuine-card {
-        border-left: 4px solid var(--primary);
+        border-left: 4px solid var(--success);
         border-radius: 25px;
     }
    
     .fake-card {
-        border: 4px solid var(--primary);
+        border: 4px solid var(--danger);
         border-radius: 25px;
     }
    
     .stat-card {
         text-align: center;
         padding: 0.8rem;
-        border-left: 4px solid var(--primary);
         border-radius: 25px;
     }
    
@@ -229,7 +228,7 @@ if uploaded_file is not None:
                        
                         with col2:
                             st.markdown(f"""
-                            <div class="card stat-card">
+                            <div class="card stat-card" style= "border: 4px solid var(--success)">
                                 <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
                                 <div class="stat-label">Vrais billets</div>
                             </div>
@@ -237,7 +236,7 @@ if uploaded_file is not None:
                        
                         with col3:
                             st.markdown(f"""
-                            <div class="card stat-card">
+                            <div class="card stat-card" style= "border: 4px solid var(--danger)">
                                 <div class="stat-value" style="color:var(--danger);">{fake_count}</div>
                                 <div class="stat-label">Faux billets</div>
                             </div>
@@ -270,6 +269,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
