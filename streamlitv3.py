@@ -251,8 +251,8 @@ if uploaded_file is not None:
                             color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
                             labels={'x': 'Véracité', 'y': 'Nombre de billets'},
                             text=[genuine_count, fake_count],
-                            width=100,
-                            height=200
+                            width=50,
+                            height=400
                         )
                         fig.update_traces(texttemplate='%{text}', textposition='outside')
                         fig.update_layout(
@@ -261,7 +261,7 @@ if uploaded_file is not None:
                             margin=dict(l=20, r=20, t=40, b=20),
                             
                         )
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, use_container_width=False)
 
                     except Exception as e:
                         st.error(f"Erreur lors de la prédiction : {str(e)}")
@@ -278,6 +278,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
