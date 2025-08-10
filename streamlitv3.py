@@ -78,6 +78,7 @@ st.markdown("""
         box-shadow: 0 4px 8px rgba(0,0,0,0.08);
         padding: 1rem;
         margin-bottom: 1rem;
+        height: 50px;
     }
    
     .genuine-card {
@@ -266,6 +267,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
