@@ -186,7 +186,7 @@ if uploaded_file is not None:
                                                         </div>
                                                     </div>
                                                     <div style="margin-left:1rem;">
-                                                        <img src="data:image/png;base64,{genuine_img}" width="80"  height="150" style="border-radius:6px;">
+                                                        <img src="data:image/png;base64,{genuine_img}" width="80"  height="120" style="border-radius:6px;">
                                                     </div>
                                                 </div>
                                             </div>
@@ -203,7 +203,7 @@ if uploaded_file is not None:
                                                         </div>
                                                     </div>
                                                     <div style="margin-left:1rem;">
-                                                        <img src="data:image/png;base64,{fake_img}" width="80" height="150" style="border-radius:6px;">
+                                                        <img src="data:image/png;base64,{fake_img}" width="80" height="120" style="border-radius:6px;">
                                                     </div>
                                                 </div>
                                             </div>
@@ -267,6 +267,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
