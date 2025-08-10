@@ -82,12 +82,12 @@ st.markdown("""
     }
    
     .genuine-card {
-        border-left: 4px solid var(--success);
+        border-left: 2px solid var(--success);
         border-radius: 25px;
     }
    
     .fake-card {
-        border-right: 4px solid var(--danger);
+        border-left: 2px solid var(--danger);
         border-radius: 25px;
     }
    
@@ -220,7 +220,7 @@ if uploaded_file is not None:
                         col1, col2, col3 = st.columns(3)
                         with col1:
                             st.markdown(f"""
-                            <div class="card stat-card">
+                            <div class="card stat-card" style= "border-right: 2px solid var(--primary)">
                                 <div class="stat-value">{len(predictions)}</div>
                                 <div class="stat-label">Billets analysés</div>
                             </div>
@@ -228,7 +228,7 @@ if uploaded_file is not None:
                        
                         with col2:
                             st.markdown(f"""
-                            <div class="card stat-card" style= "border: 4px solid var(--success)">
+                            <div class="card stat-card" style= "border-right: 2px solid var(--success)">
                                 <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
                                 <div class="stat-label">Vrais billets</div>
                             </div>
@@ -236,7 +236,7 @@ if uploaded_file is not None:
                        
                         with col3:
                             st.markdown(f"""
-                            <div class="card stat-card" style= "border: 4px solid var(--danger)">
+                            <div class="card stat-card" style= "border-right: 2px solid var(--danger)">
                                 <div class="stat-value" style="color:var(--danger);">{fake_count}</div>
                                 <div class="stat-label">Faux billets</div>
                             </div>
@@ -269,6 +269,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
