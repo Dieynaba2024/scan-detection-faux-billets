@@ -268,7 +268,8 @@ if uploaded_file is not None:
                             showlegend=False,
                             yaxis_title="Nombre de billets",
                             margin=dict(l=20, r=20, t=40, b=20),
-                            height=400
+                            width=100,
+                            height=300
                         )
                         st.plotly_chart(fig, use_container_width=True)
 
@@ -287,6 +288,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
