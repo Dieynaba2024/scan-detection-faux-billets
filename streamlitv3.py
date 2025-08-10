@@ -127,16 +127,23 @@ if uploaded_file is not None:
     try:
         df = pd.read_csv(uploaded_file, sep=';')
        
-        # Aperçu des données avec prédiction
+        # Aperçu des données
         st.markdown("#### Aperçu des données")
-        
-        # Préparation des données pour l'affichage
+        preview_rows = 5
+        table_placeholder = st.empty()
+        table_placeholder.dataframe(df.head(preview_rows), height=210, use_container_width=True)
+       
+        if len(df) > preview_rows:
+            if st.button("Afficher plus", key="show_more_btn", type="secondary"):
+                table_placeholder.dataframe(df, height=min(800, len(df)*35), use_container_width=True)
+       
         if st.button("Lancer la détection", key="analyze_btn"):
             with st.spinner("Analyse en cours..."):
                 if model is None:
                     st.error("Modèle non chargé - Impossible d'effectuer la prédiction")
                 else:
                     try:
+                        # Exemple de prétraitement (à adapter selon vos colonnes)
                         required_cols = ['diagonal', 'height_left', 'height_right', 'margin_low', 'margin_up', 'length']
                         if not all(col in df.columns for col in required_cols):
                             raise ValueError("Colonnes requises manquantes dans le fichier CSV")
@@ -150,23 +157,8 @@ if uploaded_file is not None:
                             'prediction': "Genuine" if p[1] > 0.5 else "Fake",
                             'probability': p[1]
                         } for i, p in enumerate(probas)]
-                        
-                        # Ajout de la colonne de prédiction au DataFrame
-                        df['Prédiction'] = ['Genuine' if p[1] > 0.5 else 'Fake' for p in probas]
-                        df['Probabilité'] = [p[1] if p[1] > 0.5 else 1-p[1] for p in probas]
                        
                         st.success("Analyse terminée avec succès !")
-                       
-                        # Affichage de l'aperçu avec prédiction
-                        preview_rows = 5
-                        table_placeholder = st.empty()
-                        table_placeholder.dataframe(df[['id'] + required_cols + ['Prédiction', 'Probabilité']].head(preview_rows), 
-                                                  height=210, use_container_width=True)
-       
-                        if len(df) > preview_rows:
-                            if st.button("Afficher plus", key="show_more_btn", type="secondary"):
-                                table_placeholder.dataframe(df[['id'] + required_cols + ['Prédiction', 'Probabilité']], 
-                                                          height=min(800, len(df)*35), use_container_width=True)
                        
                         # Affichage des résultats
                         st.markdown("#### Résultats de la détection")
@@ -273,7 +265,6 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
-
 
 
 
