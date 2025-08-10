@@ -87,7 +87,7 @@ st.markdown("""
     }
    
     .fake-card {
-        border: 4px solid var(--danger);
+        border-right: 4px solid var(--danger);
         border-radius: 25px;
     }
    
@@ -269,6 +269,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
