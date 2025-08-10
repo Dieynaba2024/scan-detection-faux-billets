@@ -243,7 +243,7 @@ if uploaded_file is not None:
                             """, unsafe_allow_html=True)
                        
                         
-                        st.markdown("<h4 style='text-align: center;'>Statistique des données</h4>", unsafe_allow_html=True)
+                        st.markdown("<h4 style='text-align: center;'>Graphique de la détection</h4>", unsafe_allow_html=True)
                         fig = px.bar(
                             x=['Vrai', 'Faux'],
                             y=[genuine_count, fake_count],
@@ -251,15 +251,15 @@ if uploaded_file is not None:
                             color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
                             labels={'x': 'Véracité', 'y': 'Nombre de billets'},
                             text=[genuine_count, fake_count],
-                            width=200
+                            width=100,
+                            height=200
                         )
                         fig.update_traces(texttemplate='%{text}', textposition='outside')
                         fig.update_layout(
                             showlegend=False,
                             yaxis_title="Nombre de billets",
                             margin=dict(l=20, r=20, t=40, b=20),
-                            width=100,
-                            height=300
+                            
                         )
                         st.plotly_chart(fig, use_container_width=True)
 
@@ -278,6 +278,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
