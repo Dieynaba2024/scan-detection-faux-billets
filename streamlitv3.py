@@ -131,7 +131,7 @@ if uploaded_file is not None:
         df = pd.read_csv(uploaded_file, sep=';')
        
         # Aperçu des données
-        st.markdown("#### Aperçu des données")
+        st.markdown("#### Affichage des données reçues")
         preview_rows = 5
         table_placeholder = st.empty()
         table_placeholder.dataframe(df.head(preview_rows), height=210, use_container_width=True)
@@ -268,6 +268,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
