@@ -181,7 +181,7 @@ if uploaded_file is not None:
                                             <div class="card genuine-card">
                                                 <div style="display:flex; align-items:center;">
                                                     <div style="flex:1;">
-                                                        <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Billet n°{pred['id']} Authenticité: Vrai </h5>
+                                                        <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Le billet n°{pred['id']} est Vrai </h5>
                                                         <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{pred['probability']*100:.1f}%</strong></p>
                                                         <div style="height:6px; background:#e9ecef; border-radius:3px;">
                                                             <div style="height:100%; width:{pred['probability']*100}%; background:var(--success); border-radius:3px;"></div>
@@ -198,7 +198,7 @@ if uploaded_file is not None:
                                             <div class="card fake-card">
                                                 <div style="display:flex; align-items:center;">
                                                     <div style="flex:1;">
-                                                        <h5 style="color:var(--danger); margin:0 0 0.3rem 0;">Billet n°{pred['id']} Authenticité: Faux</h5>
+                                                        <h5 style="color:var(--danger); margin:0 0 0.3rem 0;">Le billet n°{pred['id']} est Faux</h5>
                                                         <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{(1-pred['probability'])*100:.1f}%</strong></p>
                                                         <div style="height:6px; background:#e9ecef; border-radius:3px;">
                                                             <div style="height:100%; width:{(1-pred['probability'])*100}%; background:var(--danger); border-radius:3px;"></div>
@@ -254,19 +254,19 @@ if uploaded_file is not None:
                         fig.update_layout(showlegend=True, margin=dict(l=20, r=20, t=30, b=20))
                         st.plotly_chart(fig, use_container_width=True)
 
-                        st.markdown("<h4 style='text-align: center;'>Nombre de publications par catégorie</h4>", unsafe_allow_html=True)
+                        st.markdown("<h4 style='text-align: center;'>Statistique des données</h4>", unsafe_allow_html=True)
                         fig = px.bar(
                             x=['Vrai', 'Faux'],
                             y=[genuine_count, fake_count],
                             color=['Vrai', 'Faux'],
                             color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
-                            labels={'x': 'Catégorie', 'y': 'Nombre de publications'},
+                            labels={'x': 'Véracité', 'y': 'Nombre de billets'},
                             text=[genuine_count, fake_count]
                         )
                         fig.update_traces(texttemplate='%{text}', textposition='outside')
                         fig.update_layout(
                             showlegend=False,
-                            yaxis_title="Nombre de publications",
+                            yaxis_title="Nombre de billets",
                             margin=dict(l=20, r=20, t=40, b=20),
                             height=400
                         )
@@ -287,6 +287,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
