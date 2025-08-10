@@ -81,17 +81,17 @@ st.markdown("""
     }
    
     .genuine-card {
-        border: 4px solid var(--success);
+        border: 2px solid var(--success);
     }
    
     .fake-card {
-        border: 4px solid var(--danger);
+        border: 2px solid var(--danger);
     }
    
     .stat-card {
         text-align: center;
         padding: 0.8rem;
-        border: 4px solid var(--primary);
+        border: 1px solid var(--primary);
     }
    
     .stat-value {
@@ -266,6 +266,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
