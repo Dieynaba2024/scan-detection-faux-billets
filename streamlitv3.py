@@ -244,6 +244,7 @@ if uploaded_file is not None:
                        
                         
                         st.markdown("<h4 style='text-align: center;'>Graphique de la détection</h4>", unsafe_allow_html=True)
+
                         fig = px.bar(
                             x=['Vrai', 'Faux'],
                             y=[genuine_count, fake_count],
@@ -251,21 +252,32 @@ if uploaded_file is not None:
                             color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
                             labels={'x': 'Véracité', 'y': 'Nombre de billets'},
                             text=[genuine_count, fake_count],
-                            width=300,
+                            width=350,  # Largeur légèrement augmentée pour meilleure lisibilité
                             height=400
                         )
-                        fig.update_traces(texttemplate='%{text}', textposition='outside')
+                        
+                        fig.update_traces(
+                            texttemplate='%{text}',
+                            textposition='outside',
+                            width=0.6  # Réduction de la largeur des barres pour espacement
+                        )
+                        
                         fig.update_layout(
-                            showlegend=True,
+                            showlegend=False,  # Supprimé pour plus de sobriété (les couleurs sont explicites)
                             yaxis_title="Nombre de billets",
                             margin=dict(l=20, r=20, t=40, b=20),
-                            
+                            autosize=False
+                        )
+                        
+                        # Solution de centrage élégante
+                        st.markdown(
+                            """
+                            <div style="display: flex; justify-content: center;">
+                            """,
+                            unsafe_allow_html=True
                         )
                         st.plotly_chart(fig, use_container_width=False)
-                        # Centrage avec colonnes
-                        left, col, right = st.columns([1, 2, 1])  # Rapport de largeur ajustable
-                        with col:
-                            st.plotly_chart(fig, use_container_width=True)
+                        st.markdown("</div>", unsafe_allow_html=True)
 
                     except Exception as e:
                         st.error(f"Erreur lors de la prédiction : {str(e)}")
@@ -282,6 +294,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
