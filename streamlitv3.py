@@ -276,7 +276,7 @@ if uploaded_file is not None:
                             """,
                             unsafe_allow_html=True
                         )
-                        st.plotly_chart(fig, use_container_width=False)
+                        st.plotly_chart(fig, use_container_width=True)
                         st.markdown("</div>", unsafe_allow_html=True)
 
                     except Exception as e:
@@ -294,6 +294,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
