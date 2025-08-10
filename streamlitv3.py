@@ -78,7 +78,7 @@ st.markdown("""
         box-shadow: 0 4px 8px rgba(0,0,0,0.08);
         padding: 1rem;
         margin-bottom: 1rem;
-        height: 50px;
+        
     }
    
     .genuine-card {
@@ -186,7 +186,7 @@ if uploaded_file is not None:
                                                         </div>
                                                     </div>
                                                     <div style="margin-left:1rem;">
-                                                        <img src="data:image/png;base64,{genuine_img}" width="80" style="border-radius:6px;">
+                                                        <img src="data:image/png;base64,{genuine_img}" width="80"  height="80" style="border-radius:6px;">
                                                     </div>
                                                 </div>
                                             </div>
@@ -203,7 +203,7 @@ if uploaded_file is not None:
                                                         </div>
                                                     </div>
                                                     <div style="margin-left:1rem;">
-                                                        <img src="data:image/png;base64,{fake_img}" width="80" style="border-radius:6px;">
+                                                        <img src="data:image/png;base64,{fake_img}" width="80" height="80" style="border-radius:6px;">
                                                     </div>
                                                 </div>
                                             </div>
@@ -267,6 +267,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
