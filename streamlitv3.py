@@ -83,18 +83,18 @@ st.markdown("""
    
     .genuine-card {
         border-left: 4px solid var(--success);
-        border-radius: 5px;
+        border-radius: 25px;
     }
    
     .fake-card {
         border-left: 4px solid var(--danger);
-        border-radius: 5px;
+        border-radius: 25px;
     }
    
     .stat-card {
         text-align: center;
         padding: 0.8rem;
-        border-radius: 5px;
+        
     }
    
     .stat-value {
@@ -220,7 +220,7 @@ if uploaded_file is not None:
                         col1, col2, col3 = st.columns(3)
                         with col1:
                             st.markdown(f"""
-                            <div class="card stat-card" style= "border-left: 3px solid var(--primary)">
+                            <div class="card stat-card">
                                 <div class="stat-value">{len(predictions)}</div>
                                 <div class="stat-label">Billets analysés</div>
                             </div>
@@ -228,7 +228,7 @@ if uploaded_file is not None:
                        
                         with col2:
                             st.markdown(f"""
-                            <div class="card stat-card" style= "border-left: 3px solid var(--primary)">
+                            <div class="card stat-card">
                                 <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
                                 <div class="stat-label">Vrais billets</div>
                             </div>
@@ -236,7 +236,7 @@ if uploaded_file is not None:
                        
                         with col3:
                             st.markdown(f"""
-                            <div class="card stat-card" style= "border-left: 3px solid var(--primary)">
+                            <div class="card stat-card" >
                                 <div class="stat-value" style="color:var(--danger);">{fake_count}</div>
                                 <div class="stat-label">Faux billets</div>
                             </div>
@@ -254,6 +254,24 @@ if uploaded_file is not None:
                         fig.update_layout(showlegend=True, margin=dict(l=20, r=20, t=30, b=20))
                         st.plotly_chart(fig, use_container_width=True)
 
+                        st.markdown("<h4 style='text-align: center;'>Nombre de publications par catégorie</h4>", unsafe_allow_html=True)
+                        fig = px.bar(
+                            x=['Vrai', 'Faux'],
+                            y=[genuine_count, fake_count],
+                            color=['Vrai', 'Faux'],
+                            color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
+                            labels={'x': 'Catégorie', 'y': 'Nombre de publications'},
+                            text=[genuine_count, fake_count]
+                        )
+                        fig.update_traces(texttemplate='%{text}', textposition='outside')
+                        fig.update_layout(
+                            showlegend=False,
+                            yaxis_title="Nombre de publications",
+                            margin=dict(l=20, r=20, t=40, b=20),
+                            height=400
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+
                     except Exception as e:
                         st.error(f"Erreur lors de la prédiction : {str(e)}")
     except Exception as e:
@@ -269,6 +287,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
