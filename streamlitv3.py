@@ -261,7 +261,8 @@ if uploaded_file is not None:
                             color=['Vrai', 'Faux'],
                             color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
                             labels={'x': 'Véracité', 'y': 'Nombre de billets'},
-                            text=[genuine_count, fake_count]
+                            text=[genuine_count, fake_count],
+                            width=200
                         )
                         fig.update_traces(texttemplate='%{text}', textposition='outside')
                         fig.update_layout(
@@ -288,6 +289,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
