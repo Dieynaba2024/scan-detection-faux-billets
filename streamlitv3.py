@@ -279,6 +279,68 @@ if uploaded_file is not None:
                         st.plotly_chart(fig, use_container_width=False)
                         st.markdown("</div>", unsafe_allow_html=True)
 
+
+
+                        # Statistiques test
+                        genuine_count = sum(1 for p in predictions if p['prediction'] == 'Genuine')
+                        fake_count = len(predictions) - genuine_count
+                        
+                        st.markdown("<h4 style='text-align: center;'>Statistiques et Graphique</h4>", unsafe_allow_html=True)
+                        
+                        # Création de 2 colonnes : à gauche stats, à droite graphique
+                        col_stats, col_graph = st.columns([1, 1])
+                        
+                        with col_stats:
+                            st.markdown(f"""
+                            <div class="card stat-card">
+                                <div class="stat-value">{len(predictions)}</div>
+                                <div class="stat-label">Billets analysés</div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                            st.markdown(f"""
+                            <div class="card stat-card">
+                                <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
+                                <div class="stat-label">Vrais billets</div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                            st.markdown(f"""
+                            <div class="card stat-card" >
+                                <div class="stat-value" style="color:var(--danger);">{fake_count}</div>
+                                <div class="stat-label">Faux billets</div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        
+                        with col_graph:
+                            fig = px.bar(
+                                x=['Vrai', 'Faux'],
+                                y=[genuine_count, fake_count],
+                                color=['Vrai', 'Faux'],
+                                color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
+                                labels={'x': 'Véracité', 'y': 'Nombre de billets'},
+                                text=[genuine_count, fake_count],
+                                width=300,   # Taille réduite
+                                height=300
+                            )
+                            
+                            fig.update_traces(
+                                texttemplate='%{text}',
+                                textposition='outside',
+                                width=0.5
+                            )
+                            
+                            fig.update_layout(
+                                showlegend=False,
+                                yaxis_title="Nombre de billets",
+                                margin=dict(l=10, r=10, t=30, b=10),
+                                autosize=False
+                            )
+                        
+                            # Centrage du graphique dans la colonne
+                            st.plotly_chart(fig, use_container_width=False)
+
+
                     except Exception as e:
                         st.error(f"Erreur lors de la prédiction : {str(e)}")
     except Exception as e:
@@ -294,6 +356,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
