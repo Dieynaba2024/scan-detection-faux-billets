@@ -270,14 +270,11 @@ if uploaded_file is not None:
                         )
                         
                         # Solution de centrage élégante
-                        st.markdown(
-                            "<div style="display: flex; justify-content: center;">
-                            ",
-                            unsafe_allow_html=True
-                        )
-                        st.plotly_chart(fig, use_container_width=False)
-                        st.markdown("</div>", unsafe_allow_html=True)
+                        
 
+                        st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
+                        st.plotly_chart(fig, use_container_width=False)  # Garder False pour taille fixe
+                        st.markdown("</div>", unsafe_allow_html=True)
                        
                     except Exception as e:
                         st.error(f"Erreur lors de la prédiction : {str(e)}")
@@ -294,6 +291,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
