@@ -150,7 +150,7 @@ if uploaded_file is not None:
                         raise ValueError("Colonnes requises manquantes dans le fichier CSV")
 
                     # URL de ton API FastAPI (à adapter selon ton déploiement)
-                    API_URL = "http://127.0.0.1:8000/docs#/default/predict_predict_post"  # Remplace par l’URL réelle
+                    API_URL = "http://127.0.0.1:8000/predict"  # Remplace par l’URL réelle
 
                     # Convertir DataFrame en CSV en mémoire
                     csv_buffer = io.StringIO()
@@ -291,6 +291,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
