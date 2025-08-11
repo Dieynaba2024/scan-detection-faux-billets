@@ -13,6 +13,7 @@ import os
 import joblib
 from sklearn.preprocessing import StandardScaler
 import numpy as np
+import requests.exceptions
 
 # Configuration de la page
 st.set_page_config(
@@ -120,7 +121,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Section Analyse  <p style="color:white; opacity:0.9; margin:10;"> 🔎💰💵 ⛶ Solution de détection de faux billets</p>
+# Section Analyse
 uploaded_file = st.file_uploader(
     "Faites glisser et déposez le fichier ici ou cliquez sur le bouton 'Browse files' pour Parcourir",
     type=["csv"],
@@ -140,7 +141,7 @@ if uploaded_file is not None:
         if len(df) > preview_rows:
             if st.button("Afficher plus", key="show_more_btn", type="secondary"):
                 table_placeholder.dataframe(df, height=min(800, len(df)*35), use_container_width=True)
-       #Test
+       
         if st.button("Lancer la détection", key="analyze_btn"):
             with st.spinner("Analyse en cours..."):
                 try:
@@ -150,7 +151,7 @@ if uploaded_file is not None:
                         raise ValueError("Colonnes requises manquantes dans le fichier CSV")
         
                     # URL de l'API FastAPI
-                    API_URL = "http://127.0.0.1:8000/predict"  # URL corrigée
+                    API_URL = "http://127.0.0.1:8000/predict"
         
                     # Convertir DataFrame en CSV en mémoire
                     csv_buffer = io.StringIO()
@@ -173,22 +174,23 @@ if uploaded_file is not None:
                             data = response.json()
                             predictions = data["predictions"]
                             st.success("Analyse terminée avec succès !")
-                else:
-                    raise ValueError(f"Erreur API ({response.status_code}): {response.text}")
+                        else:
+                            raise ValueError(f"Erreur API ({response.status_code}): {response.text}")
 
-            except requests.exceptions.RequestException as e:
-                st.warning("L'API n'est pas disponible, utilisation du modèle local...")
-                # Fallback vers le modèle local
-                features = df[required_cols]
-                features_scaled = scaler.transform(features)
-                probabilities = model.predict_proba(features_scaled)
-                predictions = [{
-                    'id': i,
-                    'prediction': 'Genuine' if pred[1] > 0.5 else 'Fake',
-                    'probability': pred[1] if pred[1] > 0.5 else pred[0]
-                } for i, pred in enumerate(probabilities)]
-                
-                st.success("Analyse locale terminée avec succès !")
+                    except requests.exceptions.RequestException as e:
+                        st.warning("L'API n'est pas disponible, utilisation du modèle local...")
+                        # Fallback vers le modèle local
+                        features = df[required_cols]
+                        features_scaled = scaler.transform(features)
+                        probabilities = model.predict_proba(features_scaled)
+                        predictions = [{
+                            'id': i,
+                            'prediction': 'Genuine' if pred[1] > 0.5 else 'Fake',
+                            'probability': pred[1] if pred[1] > 0.5 else pred[0]
+                        } for i, pred in enumerate(probabilities)]
+                        
+                        st.success("Analyse locale terminée avec succès !")
+
                     # Affichage des résultats
                     st.markdown("#### Résultats de la détection")
                     genuine_img = image_to_base64(GENUINE_BILL_IMAGE)
@@ -312,51 +314,3 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
