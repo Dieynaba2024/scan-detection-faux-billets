@@ -148,163 +148,136 @@ if uploaded_file is not None:
                     required_cols = ['diagonal', 'height_left', 'height_right', 'margin_low', 'margin_up', 'length']
                     if not all(col in df.columns for col in required_cols):
                         raise ValueError("Colonnes requises manquantes dans le fichier CSV")
-        
+
                     # URL de ton API FastAPI (à adapter selon ton déploiement)
-                    API_URL = "https://ton-api-fastapi.onrender.com/predict"  # remplace par la vraie URL
-        
-                    # Convertir DataFrame en CSV mémoire
+                    API_URL = "https://ton-api-fastapi.onrender.com/predict"  # Remplace par l’URL réelle
+
+                    # Convertir DataFrame en CSV en mémoire
                     csv_buffer = io.StringIO()
                     df.to_csv(csv_buffer, sep=';', index=False)
                     csv_buffer.seek(0)
-        
+
                     files = {'file': ('data.csv', csv_buffer, 'text/csv')}
                     response = requests.post(API_URL, files=files)
-        
+
                     if response.status_code != 200:
                         raise ValueError(f"Erreur API : {response.status_code} - {response.text}")
-        
+
                     data = response.json()
                     predictions = data["predictions"]
-        
+
                     st.success("Analyse terminée avec succès !")
 
-        #if st.button("Lancer la détection", key="analyze_btn"):
-           # with st.spinner("Analyse en cours..."):
-                #if model is None:
-                   ## st.error("Modèle non chargé - Impossible d'effectuer la prédiction")
-               ## else:
-                    #try:
-                        # Exemple de prétraitement (à adapter selon vos colonnes)
-                       ## required_cols = ['diagonal', 'height_left', 'height_right', 'margin_low', 'margin_up', 'length']
-                        #if not all(col in df.columns for col in required_cols):
-                           # raise ValueError("Colonnes requises manquantes dans le fichier CSV")
-                           
-                        ##features = df[required_cols]
-                        #features_scaled = scaler.transform(features)
-                        ##probas = model.predict_proba(features_scaled)
-                       
-                        ##predictions = [{
-                            #'id': i,
-                            #'prediction': "Genuine" if p[1] > 0.5 else "Fake",
-                            #'probability': p[1]
-                       # } for i, p in enumerate(probas)]
-                       
-                        #st.success("Analyse terminée avec succès !")
-                       
-                        # Affichage des résultats
-                        st.markdown("#### Résultats de la détection")
-                        genuine_img = image_to_base64(GENUINE_BILL_IMAGE)
-                        fake_img = image_to_base64(FAKE_BILL_IMAGE)
-                       
-                        cols_per_row = 3
-                        for i in range(0, len(predictions), cols_per_row):
-                            cols = st.columns(cols_per_row)
-                            for j in range(cols_per_row):
-                                if i + j < len(predictions):
-                                    pred = predictions[i + j]
-                                    with cols[j]:
-                                        if pred['prediction'] == 'Genuine':
-                                            st.markdown(f"""
-                                            <div class="card genuine-card">
-                                                <div style="display:flex; align-items:center;">
-                                                    <div style="flex:1;">
-                                                        <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Le billet n°{pred['id']} est Vrai </h5>
-                                                        <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{pred['probability']*100:.1f}%</strong></p>
-                                                        <div style="height:6px; background:#e9ecef; border-radius:3px;">
-                                                            <div style="height:100%; width:{pred['probability']*100}%; background:var(--success); border-radius:3px;"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div style="margin-left:1rem;">
-                                                        <img src="data:image/png;base64,{genuine_img}" width="80"  height="120" style="border-radius:6px;">
+                    # Affichage des résultats
+                    st.markdown("#### Résultats de la détection")
+                    genuine_img = image_to_base64(GENUINE_BILL_IMAGE)
+                    fake_img = image_to_base64(FAKE_BILL_IMAGE)
+
+                    cols_per_row = 3
+                    for i in range(0, len(predictions), cols_per_row):
+                        cols = st.columns(cols_per_row)
+                        for j in range(cols_per_row):
+                            if i + j < len(predictions):
+                                pred = predictions[i + j]
+                                with cols[j]:
+                                    if pred['prediction'] == 'Genuine':
+                                        st.markdown(f"""
+                                        <div class="card genuine-card">
+                                            <div style="display:flex; align-items:center;">
+                                                <div style="flex:1;">
+                                                    <h5 style="color:var(--success); margin:0 0 0.3rem 0;">Le billet n°{pred['id']} est Vrai </h5>
+                                                    <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{pred['probability']*100:.1f}%</strong></p>
+                                                    <div style="height:6px; background:#e9ecef; border-radius:3px;">
+                                                        <div style="height:100%; width:{pred['probability']*100}%; background:var(--success); border-radius:3px;"></div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            """, unsafe_allow_html=True)
-                                        else:
-                                            st.markdown(f"""
-                                            <div class="card fake-card">
-                                                <div style="display:flex; align-items:center;">
-                                                    <div style="flex:1;">
-                                                        <h5 style="color:var(--danger); margin:0 0 0.3rem 0;">Le billet n°{pred['id']} est Faux</h5>
-                                                        <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{(1-pred['probability'])*100:.1f}%</strong></p>
-                                                        <div style="height:6px; background:#e9ecef; border-radius:3px;">
-                                                            <div style="height:100%; width:{(1-pred['probability'])*100}%; background:var(--danger); border-radius:3px;"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div style="margin-left:1rem;">
-                                                        <img src="data:image/png;base64,{fake_img}" width="80" height="120" style="border-radius:6px;">
-                                                    </div>
+                                                <div style="margin-left:1rem;">
+                                                    <img src="data:image/png;base64,{genuine_img}" width="80"  height="120" style="border-radius:6px;">
                                                 </div>
                                             </div>
-                                            """, unsafe_allow_html=True)
-                       
-                        # Statistiques
-                        genuine_count = sum(1 for p in predictions if p['prediction'] == 'Genuine')
-                        fake_count = len(predictions) - genuine_count
-                       
-                        st.markdown("<h4 style='text-align: center;'>Statistiques de détection</h4>", unsafe_allow_html=True)
-                       
-                        col1, col2, col3 = st.columns(3)
-                        with col1:
-                            st.markdown(f"""
-                            <div class="card stat-card">
-                                <div class="stat-value">{len(predictions)}</div>
-                                <div class="stat-label">Billets analysés</div>
-                            </div>
-                            """, unsafe_allow_html=True)
-                       
-                        with col2:
-                            st.markdown(f"""
-                            <div class="card stat-card">
-                                <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
-                                <div class="stat-label">Vrais billets</div>
-                            </div>
-                            """, unsafe_allow_html=True)
-                       
-                        with col3:
-                            st.markdown(f"""
-                            <div class="card stat-card" >
-                                <div class="stat-value" style="color:var(--danger);">{fake_count}</div>
-                                <div class="stat-label">Faux billets</div>
-                            </div>
-                            """, unsafe_allow_html=True)
-                       
-                        
-                        st.markdown("<h4 style='text-align: center;'>Graphique de la détection</h4>", unsafe_allow_html=True)
+                                        </div>
+                                        """, unsafe_allow_html=True)
+                                    else:
+                                        st.markdown(f"""
+                                        <div class="card fake-card">
+                                            <div style="display:flex; align-items:center;">
+                                                <div style="flex:1;">
+                                                    <h5 style="color:var(--danger); margin:0 0 0.3rem 0;">Le billet n°{pred['id']} est Faux</h5>
+                                                    <p style="margin:0 0 0.2rem 0;">Probabilité: <strong>{(1-pred['probability'])*100:.1f}%</strong></p>
+                                                    <div style="height:6px; background:#e9ecef; border-radius:3px;">
+                                                        <div style="height:100%; width:{(1-pred['probability'])*100}%; background:var(--danger); border-radius:3px;"></div>
+                                                    </div>
+                                                </div>
+                                                <div style="margin-left:1rem;">
+                                                    <img src="data:image/png;base64,{fake_img}" width="80" height="120" style="border-radius:6px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        """, unsafe_allow_html=True)
 
-                        fig = px.bar(
-                            x=['Vrai', 'Faux'],
-                            y=[genuine_count, fake_count],
-                            color=['Vrai', 'Faux'],
-                            color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
-                            labels={'x': 'Véracité', 'y': 'Nombre de billets'},
-                            text=[genuine_count, fake_count],
-                            width=450,  # Largeur légèrement augmentée pour meilleure lisibilité
-                            height=500
-                        )
-                        
-                        fig.update_traces(
-                            texttemplate='%{text}',
-                            textposition='outside',
-                            width=0.5  # Réduction de la largeur des barres pour espacement
-                        )
-                        
-                        fig.update_layout(
-                            showlegend=True,  # Supprimé pour plus de sobriété (les couleurs sont explicites)
-                            yaxis_title="Nombre de billets",
-                            margin=dict(l=20, r=20, t=40, b=20),
-                            autosize=False
-                        )
-                        
-                        # Solution de centrage élégante
-                        
+                    # Statistiques
+                    genuine_count = sum(1 for p in predictions if p['prediction'] == 'Genuine')
+                    fake_count = len(predictions) - genuine_count
 
-                        st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
-                        st.plotly_chart(fig, use_container_width=True)  # Garder False pour taille fixe
-                        st.markdown("</div>", unsafe_allow_html=True)
-                       
-                    except Exception as e:
-                        st.error(f"Erreur lors de la prédiction : {str(e)}")
+                    st.markdown("<h4 style='text-align: center;'>Statistiques de détection</h4>", unsafe_allow_html=True)
+
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.markdown(f"""
+                        <div class="card stat-card">
+                            <div class="stat-value">{len(predictions)}</div>
+                            <div class="stat-label">Billets analysés</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    with col2:
+                        st.markdown(f"""
+                        <div class="card stat-card">
+                            <div class="stat-value" style="color:var(--success);">{genuine_count}</div>
+                            <div class="stat-label">Vrais billets</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    with col3:
+                        st.markdown(f"""
+                        <div class="card stat-card" >
+                            <div class="stat-value" style="color:var(--danger);">{fake_count}</div>
+                            <div class="stat-label">Faux billets</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    st.markdown("<h4 style='text-align: center;'>Graphique de la détection</h4>", unsafe_allow_html=True)
+
+                    fig = px.bar(
+                        x=['Vrai', 'Faux'],
+                        y=[genuine_count, fake_count],
+                        color=['Vrai', 'Faux'],
+                        color_discrete_map={'Vrai': '#4CAF50', 'Faux': '#F44336'},
+                        labels={'x': 'Véracité', 'y': 'Nombre de billets'},
+                        text=[genuine_count, fake_count],
+                        width=450,
+                        height=500
+                    )
+
+                    fig.update_traces(
+                        texttemplate='%{text}',
+                        textposition='outside',
+                        width=0.5
+                    )
+
+                    fig.update_layout(
+                        showlegend=True,
+                        yaxis_title="Nombre de billets",
+                        margin=dict(l=20, r=20, t=40, b=20),
+                        autosize=False
+                    )
+
+                    st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
+                    st.plotly_chart(fig, use_container_width=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+                except Exception as e:
+                    st.error(f"Erreur lors de la prédiction : {str(e)}")
     except Exception as e:
         st.error(f"Erreur de lecture du fichier: {str(e)}")
         st.markdown("""
@@ -318,6 +291,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
