@@ -6,8 +6,10 @@ import numpy as np
 from io import StringIO
 import logging
 import traceback
+import uvicorn
 from pydantic import BaseModel
 from typing import List
+
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
@@ -126,11 +128,11 @@ async def predict(file: UploadFile = File(...)):
             status_code=500,
             detail="Erreur interne du serveur"
         )
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 @app.get("/")
 async def root():
     return {"message": "API de détection de faux billetsZ"}
 
-
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
