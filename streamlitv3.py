@@ -273,7 +273,7 @@ if uploaded_file is not None:
                         
 
                         st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
-                        st.plotly_chart(fig, use_container_width=False)  # Garder False pour taille fixe
+                        st.plotly_chart(fig, use_container_width=True)  # Garder False pour taille fixe
                         st.markdown("</div>", unsafe_allow_html=True)
                        
                     except Exception as e:
@@ -291,6 +291,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
