@@ -148,26 +148,47 @@ if uploaded_file is not None:
                     required_cols = ['diagonal', 'height_left', 'height_right', 'margin_low', 'margin_up', 'length']
                     if not all(col in df.columns for col in required_cols):
                         raise ValueError("Colonnes requises manquantes dans le fichier CSV")
-
-                    # URL de ton API FastAPI (à adapter selon ton déploiement)
-                    API_URL = "http://127.0.0.1:8000/predict"  # Remplace par l’URL réelle
-
+        
+                    # URL de l'API FastAPI
+                    API_URL = "http://127.0.0.1:8000/predict"  # URL corrigée
+        
                     # Convertir DataFrame en CSV en mémoire
                     csv_buffer = io.StringIO()
                     df.to_csv(csv_buffer, sep=';', index=False)
                     csv_buffer.seek(0)
+        
+                    # Préparer la requête avec timeout
+                    files = {'file': ('billets.csv', csv_buffer.getvalue(), 'text/csv')}
+                    
+                    # Envoyer la requête avec gestion d'erreur améliorée
+                    try:
+                        response = requests.post(
+                            API_URL,
+                            files=files,
+                            timeout=10  # Timeout de 10 secondes
+                        )
+                        
+                        # Vérifier le statut de la réponse
+                        if response.status_code == 200:
+                            data = response.json()
+                            predictions = data["predictions"]
+                            st.success("Analyse terminée avec succès !")
+                else:
+                    raise ValueError(f"Erreur API ({response.status_code}): {response.text}")
 
-                    files = {'file': ('data.csv', csv_buffer, 'text/csv')}
-                    response = requests.post(API_URL, files=files)
-
-                    if response.status_code != 200:
-                        raise ValueError(f"Erreur API : {response.status_code} - {response.text}")
-
-                    data = response.json()
-                    predictions = data["predictions"]
-
-                    st.success("Analyse terminée avec succès !")
-
+            except requests.exceptions.RequestException as e:
+                st.warning("L'API n'est pas disponible, utilisation du modèle local...")
+                # Fallback vers le modèle local
+                features = df[required_cols]
+                features_scaled = scaler.transform(features)
+                probabilities = model.predict_proba(features_scaled)
+                predictions = [{
+                    'id': i,
+                    'prediction': 'Genuine' if pred[1] > 0.5 else 'Fake',
+                    'probability': pred[1] if pred[1] > 0.5 else pred[0]
+                } for i, pred in enumerate(probabilities)]
+                
+                st.success("Analyse locale terminée avec succès !")
                     # Affichage des résultats
                     st.markdown("#### Résultats de la détection")
                     genuine_img = image_to_base64(GENUINE_BILL_IMAGE)
@@ -291,6 +312,7 @@ if uploaded_file is not None:
             </ul>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 
